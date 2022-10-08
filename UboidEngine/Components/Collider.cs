@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using UboidEngine.DataTypes;
 using UboidEngine.Entities;
+using UboidEngine.Entities.Sprites;
 
 namespace UboidEngine.Components
 {

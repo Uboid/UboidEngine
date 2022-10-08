@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using UboidEngine.DataTypes;
+using UboidEngine.Entities.Sprites;
 
-namespace UboidEngine.Entities
+namespace UboidEngine.Entities.Buttons
 {
     public class Button : Sprite
     {

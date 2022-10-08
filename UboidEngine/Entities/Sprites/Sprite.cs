@@ -2,7 +2,7 @@
 using System;
 using UboidEngine.Scenes;
 
-namespace UboidEngine.Entities
+namespace UboidEngine.Entities.Sprites
 {
     public class Sprite : Entity
     {

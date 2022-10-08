@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using SDL2;
+using UboidEngine.Entities.Sprites;
 using UboidEngine.Font;
 
-namespace UboidEngine.Entities
+namespace UboidEngine.Entities.Buttons
 {
     public class TextButton : Button
     {

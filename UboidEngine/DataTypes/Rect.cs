@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using UboidEngine.DataTypes;
 
-namespace UboidEngine.Components
+namespace UboidEngine.DataTypes
 {
     public struct Rect
     {

@@ -5,7 +5,7 @@ using System.Text;
 using UboidEngine.DataTypes;
 using UboidEngine.Font;
 
-namespace UboidEngine.Entities
+namespace UboidEngine.Entities.Sprites
 {
     public class TextSprite : Entity
     {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace UboidEngine.Entities
+namespace UboidEngine.Entities.Sprites
 {
     public class AnimatedSprite : Sprite
     {
