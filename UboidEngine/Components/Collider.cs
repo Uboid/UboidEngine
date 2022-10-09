@@ -109,7 +109,7 @@ namespace UboidEngine.Components
 
         public void CalculateCollisions()
         {
-            if (!CanCollide || Parent == null || Parent.IsOffscreen)
+            if (!Active || !CanCollide || Parent == null || Parent.IsOffscreen)
                 return;
 
             UpdateHitbox();
@@ -167,7 +167,7 @@ namespace UboidEngine.Components
 
         public void UpdateTouch()
         {
-            if (!CanTouch || Parent.IsOffscreen)
+            if (!Active || !CanTouch || Parent.IsOffscreen)
                 return;
 
             foreach(var obj in Colliders.ToArray())
@@ -205,12 +205,14 @@ namespace UboidEngine.Components
 
         public override void PostUpdate()
         {
+            if (!Active)
+                return;
             UpdateTouch();
         }
 
         public bool CheckPoint(int x = 0, int y = 0, bool relative = true)
         {
-            if (Parent == null)
+            if (!Active || Parent == null)
                 return false;
             var p = relative ? (GetPosition().ToINT()) : new Vector2Int(0, 0);
             var ignore = new List<Collider>();
@@ -220,7 +222,7 @@ namespace UboidEngine.Components
 
         public override void Update()
         {
-            if (Parent == null)
+            if (!Active || Parent == null)
                 return;
             UpdateHitbox();
 
@@ -253,7 +255,7 @@ namespace UboidEngine.Components
 
         public override void Draw()
         {
-            if (!ShowHitbox)
+            if (!ShowHitbox || !Active)
                 return;
 
             var rect = new SDL.SDL_FRect();

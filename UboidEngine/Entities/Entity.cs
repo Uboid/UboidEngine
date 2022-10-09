@@ -131,6 +131,9 @@ namespace UboidEngine.Entities
 
         public override void PreUpdate()
         {
+            if (!Active)
+                return;
+
             base.PreUpdate();
 
             foreach (var c in components.ToArray())
@@ -141,6 +144,9 @@ namespace UboidEngine.Entities
 
         public override void Update()
         {
+            if (!Active)
+                return;
+
             base.Update();
 
             foreach (var c in components.ToArray())
@@ -151,6 +157,9 @@ namespace UboidEngine.Entities
 
         public override void PostUpdate()
         {
+            if (!Active)
+                return;
+
             base.PostUpdate();
 
             foreach (var c in components.ToArray())
@@ -161,6 +170,9 @@ namespace UboidEngine.Entities
 
         public override void Draw()
         {
+            if (!Active)
+                return;
+
             base.Draw();
 
             foreach (var c in components.ToArray())

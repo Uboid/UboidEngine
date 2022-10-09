@@ -8,6 +8,7 @@ namespace UboidEngine.Components
     public abstract class Component
     {
         public Entity Parent { get; set; } = null;
+        public bool Active = true;
 
         public virtual void Start() { }
         public virtual void PreUpdate() { }
