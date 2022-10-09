@@ -51,7 +51,6 @@ namespace UboidEngine.Audio
                 SDL_mixer.Mix_HaltMusic();
                 SDL_mixer.Mix_FreeMusic(m_MusicPtr);
             }
-            SDL_mixer.Mix_OpenAudio(22050, SDL.AUDIO_S16SYS, 2, 640);
             m_MusicPtr = SDL_mixer.Mix_LoadMUS(path);
         }
 

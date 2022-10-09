@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using SDL2;
+using UboidEngine.Entities;
 using UboidEngine.Scenes;
 
 namespace UboidEngine
@@ -40,6 +41,7 @@ namespace UboidEngine
             this.m_iScreenH = h;
             Instance = this;
             this.TITLE = title;
+            new Camera();
         }
 
         public static IntPtr LoadTexture(string path)
@@ -58,11 +60,28 @@ namespace UboidEngine
             frameStart = ticks;
         }
 
+        public virtual void Start() { }
+
+        public virtual void Update()
+        {
+            SceneManager.Update();
+        }
+
+        public virtual void Draw()
+        {
+            SceneManager.Draw();
+        }
+
         public void Run()
         {
             if (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) < 0)
             {
                 Console.WriteLine($"There was an issue initilizing SDL. {SDL.SDL_GetError()}");
+            }
+            else
+            {
+                SDL.SDL_GetVersion(out var ver);
+                Console.WriteLine($"[Uboid] Initialized SDL v{ver.major}.{ver.minor}.{ver.patch}");
             }
 
             SDL_ttf.TTF_Init();
@@ -88,6 +107,23 @@ namespace UboidEngine
             {
                 Console.WriteLine($"There was an issue initilizing SDL2_Image {SDL_image.IMG_GetError()}");
             }
+            else
+            {
+                SDL_image.SDL_IMAGE_VERSION(out var ver);
+                Console.WriteLine($"[Uboid] Initialized SDL_image v{ver.major}.{ver.minor}.{ver.patch}");
+            }
+
+            if(SDL_mixer.Mix_OpenAudio(44100, SDL_mixer.MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+            {
+                Console.WriteLine($"There was an issue initilizing SDL2_Mixer {SDL_mixer.Mix_GetError()}");
+            }
+            else
+            {
+                SDL_mixer.SDL_MIXER_VERSION(out var ver);
+                Console.WriteLine($"[Uboid] Initialized SDL_mixer v{ver.major}.{ver.minor}.{ver.patch}");
+            }
+
+            Console.WriteLine($"[Uboid] Running UboidEngine v{EngineGlobal.GetVersion()}");
 
             Running = true;
 
@@ -118,8 +154,8 @@ namespace UboidEngine
                     DeltaTime = 1 / FPS_LIMIT;
                     SDL.SDL_Delay((uint)((1 / FPS_LIMIT) - DeltaTime));
                 }
-                SceneManager.Update();
-                SceneManager.Draw();
+                Update();
+                Draw();
 
                 SDL.SDL_RenderPresent(m_pRenderer);
             }

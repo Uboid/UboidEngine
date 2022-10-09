@@ -2,3 +2,5 @@ UboidEngine/bin
 UboidEngine/obj
 .vs
 Mania
+UboidEngine.Tests/bin
+UboidEngine.Tests/obj
