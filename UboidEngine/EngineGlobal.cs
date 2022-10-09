@@ -11,5 +11,22 @@ namespace UboidEngine
         public const int PATCH = 0;
 
         public static string GetVersion() => $"{MAJOR}.{MINOR}.{PATCH}";
+
+        public static void Log(string text, ConsoleColor color = ConsoleColor.White)
+        {
+            var prevColor = Console.ForegroundColor;
+            Console.ForegroundColor = color;
+            Console.WriteLine(text);
+            Console.ForegroundColor = prevColor;
+
+            try
+            {
+                if (Game.PlayerLog != null)
+                    Game.PlayerLog.WriteLine(text);
+            }
+            catch(Exception ex)
+            {
+            }
+        }
     }
 }
