@@ -13,7 +13,12 @@ namespace UboidEngine.Entities
             if (ent == null)
                 return;
             entities.Add(ent);
-            ent.Start();
+
+            if(!ent.AlreadyInitialized)
+            {
+                ent.AlreadyInitialized = true;
+                ent.Start();
+            }
         }
 
         public void RemoveEntity(Entity ent)
@@ -28,7 +33,7 @@ namespace UboidEngine.Entities
         {
             foreach (var e in entities.ToArray())
             {
-                if (e == null)
+                if (e == null || e.AlreadyInitialized)
                 {
                     continue;
                 }

@@ -9,6 +9,7 @@ namespace UboidEngine.Components
     {
         public Entity Parent { get; set; } = null;
         public bool Active = true;
+        public bool AlreadyInitialized = false;
 
         public virtual void Start() { }
         public virtual void PreUpdate() { }

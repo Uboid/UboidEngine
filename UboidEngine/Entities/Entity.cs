@@ -13,6 +13,7 @@ namespace UboidEngine.Entities
     public abstract class Entity : Container
     {
         public bool Active = true;
+        public bool AlreadyInitialized = false;
         public bool FollowCamera = true;
         public string tag = "none";
 
@@ -72,7 +73,12 @@ namespace UboidEngine.Entities
         {
             component.Parent = this;
             components.Add(component);
-            component.Start();
+
+            if(!component.AlreadyInitialized)
+            {
+                component.AlreadyInitialized = true;
+                component.Start();
+            }
         }
 
         public void RemoveComponent(Component component)
