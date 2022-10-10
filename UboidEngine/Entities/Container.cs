@@ -8,6 +8,14 @@ namespace UboidEngine.Entities
     {
         protected List<Entity> entities = new List<Entity>();
 
+        private void Sort()
+        {
+            entities.Sort((Entity a, Entity b) =>
+            {
+                return b.Priority.CompareTo(a.Priority);
+            });
+        }
+
         public void AddEntity(Entity ent)
         {
             if (ent == null)
@@ -19,6 +27,8 @@ namespace UboidEngine.Entities
                 ent.AlreadyInitialized = true;
                 ent.Start();
             }
+
+            Sort();
         }
 
         public void RemoveEntity(Entity ent)
@@ -27,6 +37,7 @@ namespace UboidEngine.Entities
                 return;
             ent.OnDestroy();
             entities.Remove(ent);
+            Sort();
         }
 
         public virtual void Start()

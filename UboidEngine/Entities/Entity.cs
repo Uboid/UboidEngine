@@ -15,6 +15,12 @@ namespace UboidEngine.Entities
         public bool Active = true;
         public bool AlreadyInitialized = false;
         public bool FollowCamera = true;
+
+        /// <summary>
+        /// lower = latest to get updated
+        /// higher = first to get updated
+        /// </summary>
+        public int Priority = 0;
         public string tag = "none";
 
         private Vector2 _position;
