@@ -40,9 +40,6 @@ namespace UboidEngine.Entities.Sprites
             var offset = (new Vector2(centerX, centerY) - mousePos) / new Vector2(centerX, centerY) * 7;
 
             Position = new Vector2(-7, -7) + offset;
-
-            Console.WriteLine(offset);
-
             base.Update();
         }
     }
