@@ -8,22 +8,42 @@ namespace UboidEngine.Entities.Sprites
 {
     public class BackgroundSprite : Sprite
     {
-        public BackgroundSprite() : base()
+        public bool Parallax { get; set; }
+
+        public BackgroundSprite(bool parallax = false) : base()
         {
+            Parallax = parallax;
             Priority = -100;
         }
 
         public void FitScreenSize()
         {
-            Position = new Vector2(0, 0);
-            Size = new Vector2(Game.Instance.m_iScreenW, Game.Instance.m_iScreenH);
+            if(!Parallax)
+            {
+                Position = new Vector2(0, 0);
+                Size = new Vector2(Game.Instance.m_iScreenW, Game.Instance.m_iScreenH);
+            }
+            else
+            {
+                Position = new Vector2(7, 7);
+                Size = new Vector2(Game.Instance.m_iScreenW + 14, Game.Instance.m_iScreenH + 14);
+            }
         }
 
-        public void FitImageSize()
+        public override void Update()
         {
-            Position = new Vector2(0, 0);
-            SDL.SDL_QueryTexture(m_pTexture, out uint format, out int access, out int w, out int h);
-            Size = new Vector2(w, h);
+            var centerX = Game.Instance.m_iScreenW / 2;
+            var centerY = Game.Instance.m_iScreenH / 2;
+
+            var mousePos = Mouse.GetPosition();
+
+            var offset = (new Vector2(centerX, centerY) - mousePos) / new Vector2(centerX, centerY) * 7;
+
+            Position = new Vector2(7, 7) - offset;
+
+            Console.WriteLine(offset);
+
+            base.Update();
         }
     }
 }
