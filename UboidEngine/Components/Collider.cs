@@ -296,7 +296,7 @@ namespace UboidEngine.Components
             rect.y = pos.y;
             rect.w = Hitbox.w;
             rect.h = Hitbox.h;
-            SDL.SDL_SetRenderDrawColor(Game.Instance.m_pRenderer, 255, 0, 0, 255);
+            SDL.SDL_SetRenderDrawColor(Game.Instance.m_pRenderer, 255, 0, 0, Active ? (byte)255 : (byte)128);
             SDL.SDL_RenderDrawRectF(Game.Instance.m_pRenderer, ref rect);
         }
     }
