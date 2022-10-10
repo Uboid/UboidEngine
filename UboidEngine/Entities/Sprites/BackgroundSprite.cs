@@ -25,7 +25,7 @@ namespace UboidEngine.Entities.Sprites
             }
             else
             {
-                Position = new Vector2(7, 7);
+                Position = new Vector2(-7, -7);
                 Size = new Vector2(Game.Instance.m_iScreenW + 14, Game.Instance.m_iScreenH + 14);
             }
         }
@@ -39,7 +39,7 @@ namespace UboidEngine.Entities.Sprites
 
             var offset = (new Vector2(centerX, centerY) - mousePos) / new Vector2(centerX, centerY) * 7;
 
-            Position = new Vector2(7, 7) - offset;
+            Position = new Vector2(-7, -7) + offset;
 
             Console.WriteLine(offset);
 
