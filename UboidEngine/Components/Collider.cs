@@ -43,6 +43,38 @@ namespace UboidEngine.Components
 
         public bool ShowHitbox { get; set; } = false;
 
+        /// <summary>
+        /// Enables all colliders that have a free space on atleast one of the sides.
+        /// </summary>
+        public static void EnableOnlyCollisionable()
+        {
+            foreach(var collider in Colliders)
+            {
+                if(collider.Parent.IsOffscreen)
+                {
+                    collider.Active = false;
+                    continue;
+                }
+
+                var position = collider.GetPosition().ToINT();
+                var size = collider.GetSize().ToINT();
+
+                Collider upCollider = Collision.GetEntityALL(position.x, position.y - 1, size.x, size.y, new List<Collider>() { collider });
+                Collider downCollider = Collision.GetEntityALL(position.x, position.y + (size.y + 1), size.x, size.y, new List<Collider>() { collider });
+                Collider leftCollider = Collision.GetEntityALL(position.x - 1, position.y, size.x, size.y, new List<Collider>() { collider });
+                Collider rightCollider = Collision.GetEntityALL(position.x + (size.x + 1), position.y, size.x, size.y, new List<Collider>() { collider });
+
+                if(upCollider == null || downCollider == null || leftCollider == null || rightCollider == null)
+                {
+                    collider.Active = true;
+                }
+                else
+                {
+                    collider.Active = false;
+                }
+            }
+        }
+
         public Vector2 GetPosition()
         {
             if (Parent == null)

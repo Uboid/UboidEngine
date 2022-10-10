@@ -10,152 +10,6 @@ namespace UboidEngine
 {
     public static class Collision
     {
-        /*
-        public static void TouchEntity(Entity ent, Entity invoker, bool enter)
-        {
-            if (!ent.CanTouch || invoker == ent) return;
-
-            if (!enter && invoker.Touching.Contains(ent))
-            {
-                ent.CollisionLeave?.Invoke(invoker);
-                invoker.Touching.Remove(ent);
-            }
-            else if (enter && !invoker.Touching.Contains(ent))
-            {
-                ent.CollisionEnter?.Invoke(invoker);
-                invoker.Touching.Add(ent);
-            }
-        }
-
-        public static bool CheckCollisionFloat(int aa, int ab, int ba, int bb)
-        {
-            float AA, BA;
-            float AB, BB;
-
-            AA = aa;
-            AB = aa + ab;
-
-            BA = ba;
-            BB = ba + bb;
-
-            if (AB <= BA || AA >= BB)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public static void CheckTouch(Entity a, Entity b)
-        {
-            if (CheckCollision(a.PositionWithAABB(), a.SizeWithAABB(), b.PositionWithAABB(), b.SizeWithAABB()))
-            {
-                TouchEntity(b, a, true);
-            }
-            else
-            {
-                TouchEntity(b, a, false);
-            }
-        }
-
-        public static CollisionType CheckCollisionEntity(Entity a, Entity b)
-        {
-            if (!a.CanCollide || !b.HasCollision)
-                return CollisionType.None;
-
-            var aa = a.PositionWithAABB();
-            var ab = a.SizeWithAABB();
-            var ba = b.PositionWithAABB();
-            var bb = b.SizeWithAABB();
-
-            if(!CheckCollision(aa, ab, ba, bb))
-                return CollisionType.None;
-
-            CollisionType result = CollisionType.None;
-
-            var ignore = new List<Entity>();
-            ignore.Add(a);
-
-            bool vUp = false;
-            bool vDown = false;
-
-            bool hLeft = false;
-            bool hRight = false;
-
-            for (int x = 0; x < ab.x; x++)
-            {
-                var ent = Collision.GetEntityAt(aa.x + x, (aa.y + ab.y) + 1);
-                if (ent == b)
-                {
-                    vDown = true;
-                }
-
-                ent = Collision.GetEntityAt(aa.x + x, aa.y - 1);
-                if (ent == b)
-                {
-                    vUp = true;
-                }
-            }
-
-            for (int y = 0; y < ab.y; y++)
-            {
-                var ent = Collision.GetEntityAt(aa.x - 1, aa.y + y);
-                if (ent == b)
-                {
-                    hLeft = true;
-                }
-
-                ent = Collision.GetEntityAt(aa.x + ab.x + 1, aa.y + y);
-                if (ent == b)
-                {
-                    hRight = true;
-                }
-            }
-
-            if(hLeft || hRight || vUp || vDown)
-            {
-                result &= ~CollisionType.None;
-            }
-
-            if (hLeft || hRight)
-            {
-                result |= CollisionType.Horizontal;
-
-                if (hLeft)
-                {
-                    result |= CollisionType.HorizontalLeft;
-                }
-
-                if (hRight)
-                {
-                    result |= CollisionType.HorizontalRight;
-                }
-            }
-
-            if (vUp || vDown)
-            {
-                result |= CollisionType.Vertical;
-
-                if (vUp)
-                {
-                    result |= CollisionType.VerticalUp;
-                }
-
-                if (vDown)
-                {
-                    result |= CollisionType.VerticalDown;
-                }
-            }
-
-
-            if (b.Trigger)
-            {
-                result = CollisionType.None;
-            }
-
-            return result;
-        }*/
-
         public static bool CheckCollision(Vector2Int aa, Vector2Int ab, Vector2Int ba, Vector2Int bb)
         {
             float leftA, leftB;
@@ -195,6 +49,29 @@ namespace UboidEngine
 
             foreach (var collider in Collider.Colliders)
             {
+                if (!collider.Active || ignore != null && ignore.Contains(collider) || (collider.Parent != null && collider.Parent.IsOffscreen))
+                {
+                    continue;
+                }
+
+                if (CheckCollision(new Vector2Int(x, y), new Vector2Int(w, h), collider.GetPosition().ToINT(), collider.GetSize().ToINT()))
+                {
+                    return collider;
+                }
+            }
+
+            return null;
+        }
+
+        public static Collider GetEntityALL(int x, int y, int w, int h, List<Collider> ignore = null)
+        {
+            if (SceneManager.CurrentScene == null)
+            {
+                return null;
+            }
+
+            foreach (var collider in Collider.Colliders)
+            {
                 if (ignore != null && ignore.Contains(collider) || (collider.Parent != null && collider.Parent.IsOffscreen))
                 {
                     continue;
@@ -211,7 +88,7 @@ namespace UboidEngine
 
         public static CollisionType CheckCollider(Collider a, Collider b)
         {
-            if (!a.CanCollide || (b.Parent != null && b.Parent.IsOffscreen))
+            if (!a.Active || !b.Active || !a.CanCollide || (b.Parent != null && b.Parent.IsOffscreen))
                 return CollisionType.None;
 
             var aa = a.GetPosition().ToINT();
