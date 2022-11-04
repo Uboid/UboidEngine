@@ -8,8 +8,8 @@ namespace UboidEngine
 {
     public static class Keyboard
     {
-        private static byte[] oldKeyboard;
-        private static byte[] newKeyboard;
+        private static byte[] oldKeyboard = new byte[] { };
+        private static byte[] newKeyboard = new byte[] { };
 
         private static bool GetKeyNew(SDL.SDL_Keycode key)
         {
@@ -24,7 +24,7 @@ namespace UboidEngine
         private static bool GetKeyOld(SDL.SDL_Keycode key)
         {
             var keyByte = (byte)SDL.SDL_GetScancodeFromKey(key);
-            if (!(oldKeyboard.Length >= 0 && keyByte < oldKeyboard.Length))
+            if ((!(oldKeyboard.Length >= 0 && keyByte < oldKeyboard.Length)))
             {
                 return false;
             }
@@ -52,6 +52,8 @@ namespace UboidEngine
             IntPtr origArray = SDL.SDL_GetKeyboardState(out arraySize);
             byte[] keys = new byte[arraySize];
             Marshal.Copy(origArray, keys, 0, arraySize);
+            oldKeyboard = newKeyboard;
+            newKeyboard = keys;
         }
     }
 }
