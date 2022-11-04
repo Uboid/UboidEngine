@@ -4,7 +4,7 @@ using System.Text;
 using tainicom.Aether.Physics2D.Common;
 using tainicom.Aether.Physics2D.Dynamics;
 
-namespace UboidEngine.Box2D
+namespace UboidEngine.Core.Box2D
 {
     public static class Physics
     {

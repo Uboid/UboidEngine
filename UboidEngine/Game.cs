@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using SDL2;
-using UboidEngine.Scenes;
+using UboidEngine.Core.Scenes;
+using UboidEngine.Core.Logging;
 
 namespace UboidEngine
 {
@@ -77,12 +76,12 @@ namespace UboidEngine
             {
                 if (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) < 0)
                 {
-                    EngineGlobal.Log($"[Uboid] There was an issue initilizing SDL. {SDL.SDL_GetError()}", ConsoleColor.Red);
+                    Log.Info($"[Uboid] There was an issue initilizing SDL. {SDL.SDL_GetError()}", ConsoleColor.Red);
                 }
                 else
                 {
                     SDL.SDL_GetVersion(out var ver);
-                    EngineGlobal.Log($"[Uboid] Initialized SDL v{ver.major}.{ver.minor}.{ver.patch}");
+                    Log.Info($"[Uboid] Initialized SDL v{ver.major}.{ver.minor}.{ver.patch}");
                 }
 
                 SDL_ttf.TTF_Init();
@@ -91,37 +90,37 @@ namespace UboidEngine
 
                 if (window == IntPtr.Zero)
                 {
-                    EngineGlobal.Log($"[Uboid] There was an issue creating the window. {SDL.SDL_GetError()}", ConsoleColor.Red);
+                    Log.Info($"[Uboid] There was an issue creating the window. {SDL.SDL_GetError()}", ConsoleColor.Red);
                 }
 
                 renderer = SDL.SDL_CreateRenderer(window, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
 
                 if (renderer == IntPtr.Zero)
                 {
-                    EngineGlobal.Log($"[Uboid] There was an issue creating the renderer. {SDL.SDL_GetError()}", ConsoleColor.Red);
+                    Log.Info($"[Uboid] There was an issue creating the renderer. {SDL.SDL_GetError()}", ConsoleColor.Red);
                 }
 
                 if (SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_PNG) == 0)
                 {
-                    EngineGlobal.Log($"[Uboid] There was an issue initilizing SDL2_image {SDL_image.IMG_GetError()}", ConsoleColor.Red);
+                    Log.Info($"[Uboid] There was an issue initilizing SDL2_image {SDL_image.IMG_GetError()}", ConsoleColor.Red);
                 }
                 else
                 {
                     SDL_image.SDL_IMAGE_VERSION(out var ver);
-                    EngineGlobal.Log($"[Uboid] Initialized SDL_image v{ver.major}.{ver.minor}.{ver.patch}");
+                    Log.Info($"[Uboid] Initialized SDL_image v{ver.major}.{ver.minor}.{ver.patch}");
                 }
 
                 if (SDL_mixer.Mix_OpenAudio(44100, SDL_mixer.MIX_DEFAULT_FORMAT, 2, 2048) < 0)
                 {
-                    EngineGlobal.Log($"[Uboid] There was an issue initilizing SDL2_mixer {SDL_mixer.Mix_GetError()}", ConsoleColor.Red);
+                    Log.Info($"[Uboid] There was an issue initilizing SDL2_mixer {SDL_mixer.Mix_GetError()}", ConsoleColor.Red);
                 }
                 else
                 {
                     SDL_mixer.SDL_MIXER_VERSION(out var ver);
-                    EngineGlobal.Log($"[Uboid] Initialized SDL_mixer v{ver.major}.{ver.minor}.{ver.patch}");
+                    Log.Info($"[Uboid] Initialized SDL_mixer v{ver.major}.{ver.minor}.{ver.patch}");
                 }
 
-                EngineGlobal.Log($"[Uboid] Running UboidEngine v{EngineGlobal.GetVersion()}", ConsoleColor.Cyan);
+                Log.Info($"[Uboid] Running UboidEngine v{EngineGlobal.GetVersion()}", ConsoleColor.Cyan);
 
                 Running = true;
 
@@ -155,8 +154,8 @@ namespace UboidEngine
             }
             catch(Exception ex)
             {
-                EngineGlobal.Log($"An error has occured and the game has been halted.", ConsoleColor.DarkRed);
-                EngineGlobal.Log($"Error is listed in 'player.log'", ConsoleColor.DarkRed);
+                Log.Info($"An error has occured and the game has been halted.", ConsoleColor.DarkRed);
+                Log.Info($"Error is listed in 'player.log'", ConsoleColor.DarkRed);
 
                 if(PlayerLog != null && !_halt)
                 {

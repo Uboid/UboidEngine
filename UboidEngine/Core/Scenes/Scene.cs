@@ -1,10 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Text;
-using UboidEngine.Core;
+﻿using System.Collections.Generic;
 
-namespace UboidEngine.Scenes
+namespace UboidEngine.Core.Scenes
 {
     public abstract class Scene
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using tainicom.Aether.Physics2D.Common;
 using tainicom.Aether.Physics2D.Dynamics;
-using UboidEngine.Box2D;
+using UboidEngine.Core.Box2D;
 
 namespace UboidEngine.Core.Components
 {

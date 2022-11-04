@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using UboidEngine.Box2D;
+﻿using UboidEngine.Core.Box2D;
 
-namespace UboidEngine.Scenes
+namespace UboidEngine.Core.Scenes
 {
     public static class SceneManager
     {
