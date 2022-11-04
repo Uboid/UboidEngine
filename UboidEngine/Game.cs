@@ -132,9 +132,6 @@ namespace UboidEngine
 
                 Running = true;
 
-                Mouse.Initialize();
-                Keyboard.Start();
-
                 while (Running)
                 {
                     while (SDL.SDL_PollEvent(out SDL.SDL_Event e) == 1)
@@ -154,6 +151,8 @@ namespace UboidEngine
                     CalculateDeltaTime();
 
                     // Update Logic Here
+                    Mouse.Update();
+                    Keyboard.Update();
                     SceneManager.UpdateScene();
 
                     SDL.SDL_RenderPresent(renderer);
