@@ -132,6 +132,7 @@ namespace UboidEngine
 
                 Running = true;
 
+                Mouse.Initialize();
                 Keyboard.Start();
 
                 while (Running)

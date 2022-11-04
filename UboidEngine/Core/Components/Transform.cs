@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using SDL2;
 
 namespace UboidEngine.Core.Components
 {
@@ -55,6 +53,34 @@ namespace UboidEngine.Core.Components
                 pos.y -= (Scale.y / 2) / 2;
 
                 return pos;
+            }
+        }
+
+        public SDL.SDL_Rect AbsoluteRect
+        {
+            get
+            {
+                return new SDL.SDL_Rect()
+                {
+                    x = (int)AbsolutePosition.x,
+                    y = (int)AbsolutePosition.y,
+                    h = (int)Scale.x,
+                    w = (int)Scale.y
+                };
+            }
+        }
+
+        public SDL.SDL_Rect Rect
+        {
+            get
+            {
+                return new SDL.SDL_Rect()
+                {
+                    x = (int)Position.x,
+                    y = (int)Position.y,
+                    h = (int)Scale.x,
+                    w = (int)Scale.y
+                };
             }
         }
 

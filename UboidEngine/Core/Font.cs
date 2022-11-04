@@ -27,5 +27,11 @@ namespace UboidEngine.Core
         {
             return new Font() { texturePointer = SDL_ttf.TTF_OpenFont(file, pixels) };
         }
+
+        public Vec2 CalculateSize(string text)
+        {
+            SDL_ttf.TTF_SizeText(texturePointer, text, out int w, out int h);
+            return new Vec2(w, h);
+        }
     }
 }

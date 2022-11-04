@@ -81,6 +81,11 @@ namespace UboidEngine.Core
             return (int)MathF.Ceiling((int)(x * y) ^ 2);
         }
 
+        public override string ToString()
+        {
+            return $"Vec2({x}, {y})";
+        }
+
         public static Vec2 zero { get; } = new Vec2(0, 0);
         public static Vec2 one { get; } = new Vec2(1, 1);
         public static Vec2 right { get; } = new Vec2(1, 0);
