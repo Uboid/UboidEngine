@@ -65,7 +65,7 @@ namespace UboidEngine.Core.Logging
 
                 if (halt)
                 {
-                    Game.OnEvent.Invoke(SDL2.SDL.SDL_EventType.SDL_QUIT, new SDL2.SDL.SDL_Event());
+                    Game.Instance?.HaltExecution();
                 }
 
                 return true;

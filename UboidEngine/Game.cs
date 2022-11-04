@@ -56,10 +56,18 @@ namespace UboidEngine
 
         public void HaltExecution()
         {
-            SceneManager.Active?.Destroy();
-            SDL.SDL_DestroyRenderer(renderer);
-            SDL.SDL_DestroyWindow(window);
-            SDL.SDL_Quit();
+            try
+            {
+                Running = false;
+                PlayerLog.Flush();
+                SceneManager.Active?.Destroy();
+                SDL.SDL_DestroyRenderer(renderer);
+                SDL.SDL_DestroyWindow(window);
+                SDL.SDL_Quit();
+            }
+            catch(Exception ex)
+            {
+            }
 
             Environment.Exit(0);
         }
@@ -134,8 +142,6 @@ namespace UboidEngine
                         switch (e.type)
                         {
                             case SDL.SDL_EventType.SDL_QUIT:
-                                Running = false;
-                                PlayerLog.Flush();
                                 HaltExecution();
                                 return;
                         }
