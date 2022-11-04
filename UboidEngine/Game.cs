@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using SDL2;
-using UboidEngine.Entities;
 using UboidEngine.Scenes;
 
 namespace UboidEngine
@@ -13,11 +12,13 @@ namespace UboidEngine
     /// </summary>
     public class Game
     {
-        public int m_iScreenW, m_iScreenH;
+        private int screenWidth, screenHeight;
 
         public static StreamWriter PlayerLog;
 
         private bool _halt = false;
+
+        public static Action<SDL.SDL_EventType, SDL.SDL_Event> OnEvent;
 
         public static Game Instance { get; private set; }
 
@@ -26,68 +27,39 @@ namespace UboidEngine
         public static float DeltaTime { get; private set; }
         private uint frameStart = 0;
 
-        public int FPS_LIMIT = 60;
+        public float FPS_LIMIT = 60f;
 
-        private string TITLE;
+        private string title;
 
-        public IntPtr m_pRenderer;
-        public IntPtr m_pWindow;
-
-        public byte[] ClearRGBA = new byte[4]
-        {
-            0,
-            0,
-            0,
-            255
-        };
+        private IntPtr renderer;
+        private IntPtr window;
 
         public Game(string title = "UboidEngine Window", int w = 640, int h = 480)
         {
-            this.m_iScreenW = w;
-            this.m_iScreenH = h;
+            this.screenWidth = w;
+            this.screenHeight = h;
             Instance = this;
-            this.TITLE = title;
-            new Camera();
-        }
-
-        public static IntPtr LoadTexture(string path)
-        {
-            IntPtr surface = SDL_image.IMG_Load(path);
-            var tex = SDL.SDL_CreateTextureFromSurface(Instance.m_pRenderer, surface);
-            SDL.SDL_FreeSurface(surface);
-
-            return tex;
+            this.title = title;
         }
 
         void CalculateDeltaTime()
         {
-            uint ticks = SDL.SDL_GetTicks();
-            DeltaTime = (ticks - frameStart) / 1000.0f;
-            frameStart = ticks;
-        }
-
-        public virtual void Start() { }
-
-        public virtual void Update()
-        {
-            SceneManager.Update();
-        }
-
-        public virtual void Draw()
-        {
-            SceneManager.Draw();
+            DeltaTime = (SDL.SDL_GetTicks() - frameStart) / 1000.0f;
+            if (DeltaTime < (float)(1f / FPS_LIMIT))
+            {
+                float deltaFps = (1 / FPS_LIMIT);
+                float time = (deltaFps - DeltaTime) * 1000;
+                DeltaTime = deltaFps;
+                SDL.SDL_Delay((uint)time);
+            }
+            frameStart = SDL.SDL_GetTicks();
         }
 
         public void HaltExecution()
         {
-            if (_halt)
-                return;
-
-            _halt = true;
-
-            SceneManager.CurrentScene?.OnDestroy();
-            SDL.SDL_DestroyRenderer(m_pRenderer);
-            SDL.SDL_DestroyWindow(m_pWindow);
+            SceneManager.Active?.Destroy();
+            SDL.SDL_DestroyRenderer(renderer);
+            SDL.SDL_DestroyWindow(window);
             SDL.SDL_Quit();
 
             Environment.Exit(0);
@@ -95,24 +67,14 @@ namespace UboidEngine
 
         public void Run()
         {
-            PlayerLog = new StreamWriter("player.log");
-            PlayerLog.AutoFlush = true;
-
-            AppDomain.CurrentDomain.ProcessExit += (o, e) =>
+            var now = DateTime.Now;
+            if(!Directory.Exists($"{Directory.GetCurrentDirectory()}/logs"))
             {
-                HaltExecution();
-
-                if (PlayerLog != null)
-                {
-                    PlayerLog.Close();
-                    PlayerLog.Dispose();
-                    PlayerLog = null;
-                }
-            };
-
+                Directory.CreateDirectory($"{Directory.GetCurrentDirectory()}/logs");
+            }
+            PlayerLog = new StreamWriter($"logs/player-{now.Day}-{now.Month}-{now.Year}_{now.Hour}-{now.Minute}-{now.Second}.log");
             try
             {
-
                 if (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) < 0)
                 {
                     EngineGlobal.Log($"[Uboid] There was an issue initilizing SDL. {SDL.SDL_GetError()}", ConsoleColor.Red);
@@ -125,26 +87,23 @@ namespace UboidEngine
 
                 SDL_ttf.TTF_Init();
 
-                m_pWindow = SDL.SDL_CreateWindow(TITLE, SDL.SDL_WINDOWPOS_UNDEFINED, SDL.SDL_WINDOWPOS_UNDEFINED, m_iScreenW, m_iScreenH, SDL.SDL_WindowFlags.SDL_WINDOW_SHOWN);
+                window = SDL.SDL_CreateWindow(title, SDL.SDL_WINDOWPOS_UNDEFINED, SDL.SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL | SDL.SDL_WindowFlags.SDL_WINDOW_SHOWN);
 
-                if (m_pWindow == IntPtr.Zero)
+                if (window == IntPtr.Zero)
                 {
                     EngineGlobal.Log($"[Uboid] There was an issue creating the window. {SDL.SDL_GetError()}", ConsoleColor.Red);
                 }
 
-                m_pRenderer = SDL.SDL_CreateRenderer(m_pWindow,
-                                                        -1,
-                                                        SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED |
-                                                        SDL.SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC);
+                renderer = SDL.SDL_CreateRenderer(window, -1, SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
 
-                if (m_pRenderer == IntPtr.Zero)
+                if (renderer == IntPtr.Zero)
                 {
                     EngineGlobal.Log($"[Uboid] There was an issue creating the renderer. {SDL.SDL_GetError()}", ConsoleColor.Red);
                 }
 
                 if (SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_PNG) == 0)
                 {
-                    EngineGlobal.Log($"[Uboid] There was an issue initilizing SDL2_Image {SDL_image.IMG_GetError()}", ConsoleColor.Red);
+                    EngineGlobal.Log($"[Uboid] There was an issue initilizing SDL2_image {SDL_image.IMG_GetError()}", ConsoleColor.Red);
                 }
                 else
                 {
@@ -154,7 +113,7 @@ namespace UboidEngine
 
                 if (SDL_mixer.Mix_OpenAudio(44100, SDL_mixer.MIX_DEFAULT_FORMAT, 2, 2048) < 0)
                 {
-                    EngineGlobal.Log($"[Uboid] There was an issue initilizing SDL2_Mixer {SDL_mixer.Mix_GetError()}", ConsoleColor.Red);
+                    EngineGlobal.Log($"[Uboid] There was an issue initilizing SDL2_mixer {SDL_mixer.Mix_GetError()}", ConsoleColor.Red);
                 }
                 else
                 {
@@ -166,37 +125,32 @@ namespace UboidEngine
 
                 Running = true;
 
+                Keyboard.Start();
+
                 while (Running)
                 {
                     while (SDL.SDL_PollEvent(out SDL.SDL_Event e) == 1)
                     {
+                        OnEvent?.Invoke(e.type, e);
                         switch (e.type)
                         {
                             case SDL.SDL_EventType.SDL_QUIT:
                                 Running = false;
+                                PlayerLog.Flush();
                                 HaltExecution();
-                                break;
+                                return;
                         }
                     }
 
-                    if (!Running)
-                        break;
-
-                    SDL.SDL_SetRenderDrawColor(m_pRenderer, ClearRGBA[0], ClearRGBA[1], ClearRGBA[2], ClearRGBA[3]);
-                    SDL.SDL_RenderClear(m_pRenderer);
-
-                    Keyboard.Update();
+                    SDL.SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                    SDL.SDL_RenderClear(renderer);
 
                     CalculateDeltaTime();
-                    if (DeltaTime < (1 / FPS_LIMIT))
-                    {
-                        DeltaTime = 1 / FPS_LIMIT;
-                        SDL.SDL_Delay((uint)((1 / FPS_LIMIT) - DeltaTime));
-                    }
-                    Update();
-                    Draw();
 
-                    SDL.SDL_RenderPresent(m_pRenderer);
+                    // Update Logic Here
+                    SceneManager.UpdateScene();
+
+                    SDL.SDL_RenderPresent(renderer);
                 }
             }
             catch(Exception ex)
@@ -212,9 +166,24 @@ namespace UboidEngine
                     PlayerLog.WriteLine($"--");
                     PlayerLog.WriteLine($"{ex.Message}\nStackTrace: {ex.StackTrace}");
                 }
-                
-                HaltExecution();
+
+                PlayerLog.Flush();
+            }
+
+            try
+            {
+                PlayerLog.Flush();
+            }
+            catch(Exception ex)
+            {
+
             }
         }
+
+        public static Game GetInstance() => Instance;
+        public IntPtr GetRenderer() => renderer;
+        public IntPtr GetWindow() => window;
+        public int GetWidth() => screenWidth;
+        public int GetHeight() => screenHeight;
     }
 }

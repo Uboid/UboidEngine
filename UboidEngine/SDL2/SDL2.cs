@@ -403,15 +403,6 @@ namespace SDL2
 			IntPtr reserved
 		);
 
-		/* Use this function with GDK/GDKX to call your C# Main() function!
-		 * Only available in SDL 2.24.0 or higher.
-		 */
-		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern int SDL_GDKRunApp(
-			SDL_main_func mainFunction,
-			IntPtr reserved
-		);
-
 		/* Use this function with iOS to call your C# Main() function!
 		 * Only available in SDL 2.0.10 or higher.
 		 */
@@ -4246,91 +4237,6 @@ namespace SDL2
 
 		#endregion
 
-		#region SDL_shape.h
-
-		public const int SDL_NONSHAPEABLE_WINDOW = -1;
-		public const int SDL_INVALID_SHAPE_ARGUMENT = -2;
-		public const int SDL_WINDOW_LACKS_SHAPE = -3;
-
-		[DllImport(nativeLibName, EntryPoint = "SDL_CreateShapedWindow", CallingConvention = CallingConvention.Cdecl)]
-		private static unsafe extern IntPtr INTERNAL_SDL_CreateShapedWindow(
-			byte* title,
-			uint x,
-			uint y,
-			uint w,
-			uint h,
-			SDL_WindowFlags flags
-		);
-
-		public static unsafe IntPtr SDL_CreateShapedWindow(string title, uint x, uint y, uint w, uint h, SDL_WindowFlags flags)
-		{
-			byte* utf8Title = Utf8EncodeHeap(title);
-			IntPtr result = INTERNAL_SDL_CreateShapedWindow(utf8Title, x, y, w, h, flags);
-			Marshal.FreeHGlobal((IntPtr)utf8Title);
-			return result;
-		}
-
-		[DllImport(nativeLibName, EntryPoint = "SDL_IsShapedWindow", CallingConvention = CallingConvention.Cdecl)]
-		public static extern SDL_bool SDL_IsShapedWindow(IntPtr window);
-
-		public enum WindowShapeMode
-		{
-			ShapeModeDefault,
-			ShapeModeBinarizeAlpha,
-			ShapeModeReverseBinarizeAlpha,
-			ShapeModeColorKey
-		}
-
-		public static bool SDL_SHAPEMODEALPHA(WindowShapeMode mode)
-		{
-			switch (mode)
-			{
-				case WindowShapeMode.ShapeModeDefault:
-				case WindowShapeMode.ShapeModeBinarizeAlpha:
-				case WindowShapeMode.ShapeModeReverseBinarizeAlpha:
-					return true;
-				default:
-					return false;
-			}
-		}
-
-		[StructLayout(LayoutKind.Explicit)]
-		public struct SDL_WindowShapeParams
-		{
-			[FieldOffset(0)]
-			public byte binarizationCutoff;
-			[FieldOffset(0)]
-			public SDL_Color colorKey;
-		}
-
-		[StructLayout(LayoutKind.Sequential)]
-		public struct SDL_WindowShapeMode
-		{
-			public WindowShapeMode mode;
-			public SDL_WindowShapeParams parameters;
-		}
-
-		[DllImport(nativeLibName, EntryPoint = "SDL_SetWindowShape", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int SDL_SetWindowShape(
-			IntPtr window,
-			IntPtr shape,
-			ref SDL_WindowShapeMode shape_mode
-		);
-
-		[DllImport(nativeLibName, EntryPoint = "SDL_GetShapedWindowMode", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int SDL_GetShapedWindowMode(
-			IntPtr window,
-			out SDL_WindowShapeMode shape_mode
-		);
-
-		[DllImport(nativeLibName, EntryPoint = "SDL_GetShapedWindowMode", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int SDL_GetShapedWindowMode(
-			IntPtr window,
-			IntPtr shape_mode
-		);
-
-		#endregion
-
 		#region SDL_surface.h
 
 		public const uint SDL_SWSURFACE =	0x00000000;
@@ -5222,7 +5128,7 @@ namespace SDL2
 		[StructLayout(LayoutKind.Sequential)]
 		public struct SDL_ControllerTouchpadEvent
 		{
-			public SDL_EventType type;
+			public UInt32 type;
 			public UInt32 timestamp;
 			public Int32 which; /* SDL_JoystickID */
 			public Int32 touchpad;
@@ -5236,7 +5142,7 @@ namespace SDL2
 		[StructLayout(LayoutKind.Sequential)]
 		public struct SDL_ControllerSensorEvent
 		{
-			public SDL_EventType type;
+			public UInt32 type;
 			public UInt32 timestamp;
 			public Int32 which; /* SDL_JoystickID */
 			public Int32 sensor;
@@ -5251,7 +5157,7 @@ namespace SDL2
 		[StructLayout(LayoutKind.Sequential)]
 		public struct SDL_AudioDeviceEvent
 		{
-			public SDL_EventType type;
+			public UInt32 type;
 			public UInt32 timestamp;
 			public UInt32 which;
 			public byte iscapture;
@@ -5264,7 +5170,7 @@ namespace SDL2
 		[StructLayout(LayoutKind.Sequential)]
 		public struct SDL_TouchFingerEvent
 		{
-			public SDL_EventType type;
+			public UInt32 type;
 			public UInt32 timestamp;
 			public Int64 touchId; // SDL_TouchID
 			public Int64 fingerId; // SDL_GestureID
@@ -5279,7 +5185,7 @@ namespace SDL2
 		[StructLayout(LayoutKind.Sequential)]
 		public struct SDL_MultiGestureEvent
 		{
-			public SDL_EventType type;
+			public UInt32 type;
 			public UInt32 timestamp;
 			public Int64 touchId; // SDL_TouchID
 			public float dTheta;
@@ -5293,7 +5199,7 @@ namespace SDL2
 		[StructLayout(LayoutKind.Sequential)]
 		public struct SDL_DollarGestureEvent
 		{
-			public SDL_EventType type;
+			public UInt32 type;
 			public UInt32 timestamp;
 			public Int64 touchId; // SDL_TouchID
 			public Int64 gestureId; // SDL_GestureID
@@ -5341,7 +5247,7 @@ namespace SDL2
 		[StructLayout(LayoutKind.Sequential)]
 		public struct SDL_UserEvent
 		{
-			public SDL_EventType type;
+			public UInt32 type;
 			public UInt32 timestamp;
 			public UInt32 windowID;
 			public Int32 code;
@@ -5447,15 +5353,6 @@ namespace SDL2
 		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern int SDL_PeepEvents(
 			[Out] SDL_Event[] events,
-			int numevents,
-			SDL_eventaction action,
-			SDL_EventType minType,
-			SDL_EventType maxType
-		);
-
-		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern unsafe int SDL_PeepEvents(
-			SDL_Event* events,
 			int numevents,
 			SDL_eventaction action,
 			SDL_EventType minType,
@@ -6508,16 +6405,6 @@ namespace SDL2
 		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern SDL_TouchDeviceType SDL_GetTouchDeviceType(Int64 touchID);
 
-		/* Only available in 2.0.22 or higher. */
-		[DllImport(nativeLibName, EntryPoint = "SDL_GetTouchName", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr INTERNAL_SDL_GetTouchName(int index);
-
-		/* Only available in 2.0.22 or higher. */
-		public static string SDL_GetTouchName(int index)
-		{
-			return UTF8_ToManaged(INTERNAL_SDL_GetTouchName(index));
-		}
-
 		#endregion
 
 		#region SDL_joystick.h
@@ -6602,7 +6489,7 @@ namespace SDL2
 		public static extern SDL_bool SDL_JoystickGetAxisInitialState(
 			IntPtr joystick,
 			int axis,
-			out short state
+			out ushort state
 		);
 
 		/* joystick refers to an SDL_Joystick* */
@@ -7516,17 +7403,6 @@ namespace SDL2
 			IntPtr gamecontroller,
 			SDL_SensorType type,
 			IntPtr data,
-			int num_values
-		);
-
-		/* gamecontroller refers to an SDL_GameController*.
-		 * Only available in 2.0.14 or higher.
-		 */
-		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern int SDL_GameControllerGetSensorData(
-			IntPtr gamecontroller,
-			SDL_SensorType type,
-			[In] float[] data,
 			int num_values
 		);
 
@@ -8884,7 +8760,7 @@ namespace SDL2
 
 		/* Only available in SDL 2.0.11 or higher. */
 		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-		public static extern SDL_bool SDL_HasARMSIMD();
+		public static extern void SDL_HasARMSIMD();
 
 		#endregion
 

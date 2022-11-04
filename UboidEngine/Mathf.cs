@@ -4,7 +4,7 @@ using System.Text;
 
 namespace UboidEngine
 {
-    public static class MathEx
+    public static class Mathf
     {
 		public static float Clamp01(float value)
 		{

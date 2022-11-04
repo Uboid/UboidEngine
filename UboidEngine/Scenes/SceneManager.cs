@@ -1,57 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
-using UboidEngine.Entities;
+using UboidEngine.Box2D;
 
 namespace UboidEngine.Scenes
 {
     public static class SceneManager
     {
-        public static Scene CurrentScene { get; private set; }
+        public static Scene Active { get; private set; } = null;
 
-        public static void LoadScene(Scene scene, bool resetCamera = true)
+        public static void LoadScene(Scene scene)
         {
-            if (scene == null)
-                return;
-            CurrentScene?.OnDestroy();
-            CurrentScene = scene;
-            if (!Game.Instance.Running)
+            if (Active != null)
             {
-                return;
+                Active.Destroy();
             }
-            if (resetCamera && Camera.main != null)
-            {
-                Camera.main.Position = new DataTypes.Vector2();
-            }
-            CurrentScene.Start();
+
+            Physics.CreateNewWorld();
+            Active = scene;
+
+            if(Game.GetInstance().Running)
+                Active.Start();
         }
 
-        public static void Update()
+        public static void UpdateScene()
         {
-            if (CurrentScene == null)
+            if (Active == null)
                 return;
 
-            if(!CurrentScene.Started())
+            if(!Active.Started)
             {
-                CurrentScene.Start();
+                Active.Start();
             }
-            CurrentScene.PreUpdate();
-            CurrentScene.Update();
-            CurrentScene.PostUpdate();
-        }
 
-        public static void Draw()
-        {
-            if (CurrentScene == null)
-                return;
+            Active.PreUpdate();
+            Active.Update();
+            Active.LateUpdate();
+            Active.Render();
 
-            CurrentScene.Draw();
-        }
-
-        public static Task LoadSceneTask(Scene scene, bool resetCamera = true)
-        {
-            return Task.Factory.StartNew(() => LoadScene(scene, resetCamera));
+            if(Physics.UsePhysics)
+                Physics.CurrentWorld?.Step(Game.DeltaTime);
         }
     }
 }
