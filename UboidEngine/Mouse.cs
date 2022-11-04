@@ -6,6 +6,9 @@ namespace UboidEngine
 {
     public static class Mouse
     {
+        private static uint oldMouse;
+        private static uint newMouse;
+
         public static Vec2 mousePosition { get; private set; }
 
         public static SDL.SDL_Rect Rect
@@ -22,55 +25,36 @@ namespace UboidEngine
             }
         }
 
-        private static Dictionary<uint, bool> newMouse = new Dictionary<uint, bool>();
-        private static Dictionary<uint, bool> oldMouse = new Dictionary<uint, bool>();
-
-        private static void ReceivedEvent(SDL.SDL_EventType et, SDL.SDL_Event ev)
+        public static void Update()
         {
-            if(et == SDL.SDL_EventType.SDL_MOUSEMOTION)
-            {
-                mousePosition = new Vec2(ev.motion.x, ev.motion.y);
-            }
-            else if (et == SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN)
-            {
-                var btnEv = ev.button;
-
-                if (newMouse.TryGetValue(btnEv.button, out bool pressed))
-                {
-                    oldMouse[btnEv.button] = pressed;
-                }
-                newMouse[btnEv.button] = false;
-            }
-            else if (et == SDL.SDL_EventType.SDL_MOUSEBUTTONUP)
-            {
-                var btnEv = ev.button;
-
-                if (newMouse.TryGetValue(btnEv.button, out bool pressed))
-                {
-                    oldMouse[btnEv.button] = pressed;
-                }
-                newMouse[btnEv.button] = true;
-            }
+            oldMouse = newMouse;
+            newMouse = SDL.SDL_GetMouseState(out int x, out int y);
+            mousePosition = new Vec2(x, y);
         }
 
-        public static void Initialize()
+        private static bool GetButtonNew(uint button)
         {
-            Game.OnEvent += ReceivedEvent;
+            return (newMouse & button) != 0;
+        }
+
+        private static bool GetButtonOld(uint button)
+        {
+            return (oldMouse & button) != 0;
         }
 
         public static bool GetButton(uint button)
         {
-            return newMouse.TryGetValue(button, out bool pressed) && pressed;
+            return GetButtonNew(button);
         }
 
         public static bool GetButtonDown(uint button)
         {
-            return (!oldMouse.TryGetValue(button, out bool pressed) || !pressed) && (newMouse.TryGetValue(button, out pressed) && pressed);
+            return !GetButtonOld(button) && GetButtonNew(button);
         }
 
         public static bool GetButtonUp(uint button)
         {
-            return (oldMouse.TryGetValue(button, out bool pressed) && pressed) && (!newMouse.TryGetValue(button, out pressed) || !pressed);
+            return GetButtonOld(button) && !GetButtonNew(button);
         }
     }
 }

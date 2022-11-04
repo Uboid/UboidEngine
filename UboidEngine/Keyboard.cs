@@ -8,56 +8,50 @@ namespace UboidEngine
 {
     public static class Keyboard
     {
-        private static Dictionary<SDL.SDL_Keycode, bool> oldKeyboard = new Dictionary<SDL.SDL_Keycode, bool>();
-        private static Dictionary<SDL.SDL_Keycode, bool> newKeyboard = new Dictionary<SDL.SDL_Keycode, bool>();
+        private static byte[] oldKeyboard;
+        private static byte[] newKeyboard;
 
-        public static Action<SDL.SDL_Keycode> OnKeyDown;
-        public static Action<SDL.SDL_Keycode> OnKeyUp;
-
-        public static bool GetKey(SDL.SDL_Keycode _keycode)
+        private static bool GetKeyNew(SDL.SDL_Keycode key)
         {
-            return newKeyboard.TryGetValue(_keycode, out bool pressed) && pressed;
-        }
-
-        public static bool GetKeyDown(SDL.SDL_Keycode _keycode)
-        {
-            return (!oldKeyboard.TryGetValue(_keycode, out bool pressed) || !pressed) && (newKeyboard.TryGetValue(_keycode, out pressed) && pressed);
-        }
-
-        public static bool GetKeyUp(SDL.SDL_Keycode _keycode)
-        {
-            return (oldKeyboard.TryGetValue(_keycode, out bool pressed) && pressed) && (!newKeyboard.TryGetValue(_keycode, out pressed) || !pressed);
-        }
-
-        private static void ReceivedEvent(SDL.SDL_EventType type, SDL.SDL_Event e)
-        {
-            if(type == SDL.SDL_EventType.SDL_KEYDOWN)
+            var keyByte = (byte)SDL.SDL_GetScancodeFromKey(key);
+            if (!(newKeyboard.Length >= 0 && keyByte < newKeyboard.Length))
             {
-                OnKeyDown?.Invoke(e.key.keysym.sym);
-
-                if (newKeyboard.TryGetValue(e.key.keysym.sym, out var oldPressed))
-                {
-                    oldKeyboard[e.key.keysym.sym] = oldPressed;
-                }
-
-                newKeyboard[e.key.keysym.sym] = true;
+                return false;
             }
-            else if (type == SDL.SDL_EventType.SDL_KEYUP)
-            {
-                OnKeyUp?.Invoke(e.key.keysym.sym);
-
-                if (newKeyboard.TryGetValue(e.key.keysym.sym, out var oldPressed))
-                {
-                    oldKeyboard[e.key.keysym.sym] = oldPressed;
-                }
-
-                newKeyboard[e.key.keysym.sym] = false;
-            }
+            return newKeyboard[keyByte] == 1;
         }
 
-        public static void Start()
+        private static bool GetKeyOld(SDL.SDL_Keycode key)
         {
-            Game.OnEvent += ReceivedEvent;
+            var keyByte = (byte)SDL.SDL_GetScancodeFromKey(key);
+            if (!(oldKeyboard.Length >= 0 && keyByte < oldKeyboard.Length))
+            {
+                return false;
+            }
+            return oldKeyboard[keyByte] == 1;
+        }
+
+        public static bool GetKey(SDL.SDL_Keycode key)
+        {
+            return GetKeyNew(key);
+        }
+
+        public static bool GetKeyDown(SDL.SDL_Keycode key)
+        {
+            return !GetKeyOld(key) && GetKeyNew(key);
+        }
+
+        public static bool GetKeyUp(SDL.SDL_Keycode key)
+        {
+            return GetKeyOld(key) && !GetKeyNew(key);
+        }
+
+        public static void Update()
+        {
+            int arraySize;
+            IntPtr origArray = SDL.SDL_GetKeyboardState(out arraySize);
+            byte[] keys = new byte[arraySize];
+            Marshal.Copy(origArray, keys, 0, arraySize);
         }
     }
 }

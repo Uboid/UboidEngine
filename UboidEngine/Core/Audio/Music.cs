@@ -14,12 +14,25 @@ namespace UboidEngine.Core.Audio
         {
             get
             {
-                if(Assert("get_IsPlaying()"))
+                if (Assert("get_IsPlaying()"))
                 {
                     return false;
                 }
 
                 return SDL_mixer.Mix_PlayingMusic() > 0;
+            }
+        }
+
+        public static bool IsPaused
+        {
+            get
+            {
+                if (Assert("get_IsPaused()"))
+                {
+                    return false;
+                }
+
+                return SDL_mixer.Mix_PausedMusic() > 0;
             }
         }
 
