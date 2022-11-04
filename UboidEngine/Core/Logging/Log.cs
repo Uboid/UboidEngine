@@ -25,41 +25,17 @@ namespace UboidEngine.Core.Logging
 
         public static void Warning(string text)
         {
-            var prevColor = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(text);
-            Console.ForegroundColor = prevColor;
-
-            try
-            {
-                if (Game.PlayerLog != null)
-                    Game.PlayerLog.WriteLine($"[!] {text}");
-            }
-            catch (Exception ex)
-            {
-            }
+            Info($"[!] {text}", ConsoleColor.Yellow);
         }
 
         public static void Error(string text)
         {
-            var prevColor = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(text);
-            Console.ForegroundColor = prevColor;
-
-            try
-            {
-                if (Game.PlayerLog != null)
-                    Game.PlayerLog.WriteLine($"[-] {text}");
-            }
-            catch (Exception ex)
-            {
-            }
+            Info($"[-] {text}", ConsoleColor.Red);
         }
 
         public static bool Assert(bool condition, string message = null, bool halt = true)
         {
-            if (!condition)
+            if (condition)
             {
                 Error(message ?? "Assert condition is false.");
 

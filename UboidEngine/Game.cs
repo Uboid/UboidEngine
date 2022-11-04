@@ -118,7 +118,7 @@ namespace UboidEngine
                     Log.Info($"[Uboid] Initialized SDL_image v{ver.major}.{ver.minor}.{ver.patch}");
                 }
 
-                if (SDL_mixer.Mix_OpenAudio(44100, SDL_mixer.MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+                if (SDL_mixer.Mix_Init(SDL_mixer.MIX_InitFlags.MIX_INIT_MP3 | SDL_mixer.MIX_InitFlags.MIX_INIT_OGG | SDL_mixer.MIX_InitFlags.MIX_INIT_OPUS) < 0 || SDL_mixer.Mix_OpenAudio(44100, SDL_mixer.MIX_DEFAULT_FORMAT, 2, 2048) < 0)
                 {
                     Log.Info($"[Uboid] There was an issue initilizing SDL2_mixer {SDL_mixer.Mix_GetError()}", ConsoleColor.Red);
                 }
